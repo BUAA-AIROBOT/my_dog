@@ -48,13 +48,13 @@ class AudioModule():
     def run(self,need_dump=False):
         '''运行'''
         if self.mode == "listen_mode":
-            audio = self._listen()
+            audio = self.listen()
         else:
-            audio = self._read_wav()
-        self._translate(audio)
+            audio = self.read_wav()
+        self.translate(audio)
         if need_dump:
             #dump audio对象
-            self._dump(audio)
+            self.dump(audio)
 
 if __name__ == '__main__':
     audio_module = AudioModule(wav_file_name="test_zh.wav",text_file_name="test.txt",mode="read_mode",language="zh-CN")
