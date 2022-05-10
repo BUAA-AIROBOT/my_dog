@@ -2,12 +2,14 @@ import speech_recognition as sr
 
 class AudioModule():
     '''google api'''
-    def __init__(self,wav_file_name=None,text_file_name=None,dumped_wav_file_name=None,mode="listen_mode",language="zh-CN"):
+    def __init__(self,wav_file_name=None,text_file_name=None,dumped_wav_file_name=None,
+                 mode="listen_mode",api="google",language="zh-CN"):
         self.recognizer = sr.Recognizer()
         self.wav_file_name = wav_file_name
         self.text_file_name = text_file_name
         self.dumped_wav_file_name = dumped_wav_file_name
         self.mode = mode
+        self.api = api
         self.language = language
 
     def listen(self):
@@ -26,11 +28,15 @@ class AudioModule():
                 audio = self.recognizer.listen(source)
                 return audio
 
-    def translate(self,audio):
-        '''请求谷歌翻译服务 进行翻译'''
+    def recognize(self,audio):
+        '''请求识别服务 进行识别'''
         try:
-            print("处理中...")
-            text = self.recognizer.recognize_google(audio,language=self.language)
+            if self.api == "google":
+                print("google在线处理中...")
+                text = self.recognizer.recognize_google(audio,language=self.language)
+            else:
+                print("CMU sphinx离线处理中...")
+                text = self.recognizer.recognize_sphinx(audio,language=self.language)
             with open(self.text_file_name,'w') as f:
                 f.write(text)
                 print("已将识别结果保存在本地！")
@@ -51,11 +57,12 @@ class AudioModule():
             audio = self.listen()
         else:
             audio = self.read_wav()
-        self.translate(audio)
+        self.recognize(audio)
         if need_dump:
             #dump audio对象
             self.dump(audio)
 
 if __name__ == '__main__':
-    audio_module = AudioModule(wav_file_name="test_zh.wav",text_file_name="test.txt",mode="read_mode",language="zh-CN")
+    audio_module = AudioModule(wav_file_name="test_zh.wav",text_file_name="test.txt",
+                               mode="read_mode",api="google",language="zh-CN")
     audio_module.run()
